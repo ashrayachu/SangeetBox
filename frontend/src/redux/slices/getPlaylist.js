@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
+const API_URL = import.meta.env.VITE_API_URL;
 
 
 // 🎵 Async function to play a song (API call)
@@ -10,7 +11,7 @@ export const getPlaylist = createAsyncThunk(
    
     try {
       console.log("Sending request:", {playlistId});
-      const response = await axios.get("http://localhost:5000/api/playlist", {
+      const response = await axios.get(`${API_URL}/api/playlist`, {
         params: { playlistId: encodeURIComponent(playlistId) }
     });
     return response.data;

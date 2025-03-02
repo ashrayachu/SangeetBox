@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Async function to search songs
 export const searchSongs = createAsyncThunk("search/searchSongs", async (query, { rejectWithValue }) => {
@@ -10,7 +11,7 @@ export const searchSongs = createAsyncThunk("search/searchSongs", async (query, 
   }
 
   try {
-    const response = await axios.get("http://localhost:5000/api/search", {
+    const response = await axios.get(`${API_URL}/api/search`, {
       params: { query },
     });
     return response.data;

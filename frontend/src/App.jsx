@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
@@ -18,6 +21,7 @@ function App() {
   // const [maximize, setMaximize] = useState(false); // Moved state to App
   return (
     <Router>
+      <ToastContainer />
       <div className="h-screen flex flex-col ">
         <Navbar />
         <div className="flex flex-grow">
@@ -35,7 +39,7 @@ function App() {
         <Footer />
         <div className="relative z-50">
           <MusicPlayer />
-        </div>  
+        </div>
 
       </div>
     </Router>
