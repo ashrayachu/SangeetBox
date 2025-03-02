@@ -20,7 +20,7 @@ const playSong = async (req, res) => {
       public_id: songId,
       format: "mp3",
     });
-    console.log(uploadResult);
+    
     const newSong = new Song({ songId, name: songName, cloudinaryUrl: uploadResult.secure_url });
     await newSong.save();
 

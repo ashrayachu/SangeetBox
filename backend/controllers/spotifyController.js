@@ -36,11 +36,11 @@ const searchTracks = async (req, res) => {
 
   try {
     const response = await axios.get(
-      `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`,
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track,playlist&limit=10`,
       { headers: { Authorization: `Bearer ${spotifyToken}` } }
     );
 
-    res.json(response.data.tracks.items);
+    res.json(response.data);
   } catch (error) {
     console.error("Error searching tracks:", error.message);
     res.status(500).json({ error: "Failed to fetch songs from Spotify" });

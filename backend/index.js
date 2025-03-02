@@ -4,6 +4,8 @@ const connectDB = require("./config/db");
 const spotifyRoutes = require("./routes/spotifyRoutes");
 const songRoutes = require("./routes/songRoutes");
 const karaokeRoutes = require("./routes/karaokeRoutes");
+const PlaylistRoutes = require("./routes/PlaylistRoutes");
+
 
 require("dotenv").config();
 
@@ -16,6 +18,8 @@ connectDB();
 app.use("/api", spotifyRoutes);
 app.use("/api", songRoutes);
 app.use("/api", karaokeRoutes);
+app.use("/api", PlaylistRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
