@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import ReactPlayer from "react-player";
 import { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { playPause, stopSong, toggleMaximize } from "../redux/slices/playSong"; // Import actions
+import { playPause, playSong, stopSong, toggleMaximize, nextSong } from "../redux/slices/playSong"; // Import actions
 import Slider from '@mui/material/Slider';
 import CircularProgress from '@mui/material/CircularProgress';
 import { searchSongs } from "../redux/slices/searchSong";
-
 
 import { useNavigate } from "react-router-dom";
 
@@ -34,55 +33,89 @@ const MusicPlayer = () => {
 
   useEffect(() => {
     if (error) {
-      navigate("/error", { state: { message: error, status:status
-       } });
+      navigate("/error", {
+        state: {
+          message: error, status: status
+        }
+      });
     }
   }, [error, navigate]);
 
   const [volume, setVolume] = useState(30);
+  const [foundSong, setFoundSong] = useState(null);
   const [position, setPosition] = useState(0);
   const [playerDuration, setPlayerDuration] = useState(0);
 
   const { searchResults } = useSelector((state) => state.search);
 
+
+
   const currentSong = useSelector((state) => state.playSong?.currentSong);
   const status = useSelector((state) => state.playSong?.status);
   const maximize = useSelector((state) => state.playSong?.maximize);
-  console.log("Maximize state:", maximize);
+  const currentIndex = useSelector((state) => state.playSong?.currentIndex);
+
+  const playlistItems = useSelector((state) => state.playlist?.playlistItems);
 
 
-  console.log("searchSongs", searchResults);
-
-  console.log("current song", currentSong);
-
-  let foundSong
-  if (currentSong) {
-    foundSong = searchResults.find((eachSong) => eachSong.id === currentSong.songId);
-    console.log("foundSong", foundSong);
-    if (foundSong) {
-      console.log("currentSong.songId eachSong.id", currentSong.songId, foundSong.id);
-    } else {
-      console.log("Song not found in searchResults");
+  useEffect(() => {
+    if (currentSong) {
+      let song = null;
+      // Find the song in search results
+      if (searchResults.tracks?.items.length > 0) {
+        song = searchResults.tracks.items.find((eachSong) => eachSong.id === currentSong.songId);
+      }
+      // Find the song in the playlist if not found in search results
+      if (!song && playlistItems?.data?.items.length > 0) {
+        song = playlistItems.data.items.find((eachSong) => eachSong.track.id === currentSong.songId);
+      }
+      setFoundSong(song); // ✅ Store in state
     }
-  }
-  const image = foundSong?.album.images[0].url;
-  const title = foundSong?.name;
-  const artist = foundSong?.artists[0].name;
-  const duration = currentSong?.duration_ms / 1000;
+  }, [currentSong, searchResults, playlistItems]);
+
+  const image = foundSong?.album?.images?.[0]?.url
+    || (foundSong?.track && foundSong.track.album?.images?.[0]?.url)
+    || "";
+
+  const title = foundSong?.name
+    || (foundSong?.track && foundSong.track.name)
+    || "Unknown Song";
+
+  const artist = foundSong?.artists?.[0]?.name
+    || (foundSong?.track && foundSong.track.artists?.[0]?.name)
+    || "Unknown Artist";
+
+
   const handleToggleMaximize = () => { dispatch(toggleMaximize()); };
-
-
 
   const handlePlayPause = () => {
     dispatch(playPause());
   };
 
+  const handleNextSong = () => {
+
+    if (currentIndex < playlistItems?.data?.items.length - 1) {
+      const songId = playlistItems?.data?.items[currentIndex + 1]?.track.id;
+      const songUrl = playlistItems?.data?.items[currentIndex + 1]?.track.external_urls.spotify;
+      console.log("songId in music player", songId);
+      console.log("songUrl music player", songUrl);
+      if (status != 'loading') {
+        dispatch(nextSong());
+        dispatch(playSong({ songId, songUrl })).catch((error) => {
+          alert("Error playing the song:");
+          console.error("Error playing the song:", error);
+
+        });
+      }
+
+    }
+  }
   const handleDownload = () => {
     if (!currentSong?.url) return;
 
     const link = document.createElement("a");
     link.href = currentSong.url;
-    link.setAttribute("download", currentSong.title || "song.mp3");
+    link.setAttribute("download", title || "song.mp3");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -105,16 +138,22 @@ const MusicPlayer = () => {
 
   return (
     <>
-
-      <div className={`border-t border-neutral-800 bg-black p-5  ${maximize ? "fixed top-0 left-0 h-screen w-full flex flex-col " : "min-h-[15vh] fixed bottom-0 left-0 w-full  "
+      <div className={`border-t border-neutral-800 bg-black p-5  ${maximize ? "fixed top-0 left-0 h-screen w-full" : "min-h-[15vh] fixed bottom-0 left-0 w-full  "
         }`}
       >
-        <div className={`${maximize ? "flex w-full h-[85vh]" : "hidden"}`} >
-          <img
-            src={image || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D "}
-            alt="Now Playing"
-            className="w-full h-5/6 object-contain"
-          />
+        <div className={`${maximize ? "flex flex-col items-center justify-center gap-2 w-full" : "hidden"}`} >
+          <div className="w-full md:h-[85vh] flex items-center justify-center">
+            <img
+              src={image || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D "}
+              alt="Now Playing"
+              className="w-full h-[75vh] object-contain"
+            />
+          </div>
+
+          <div className={`${maximize ? "flex flex-col w-full h-[10vh] md:hidden" : "hidden"}`}>
+            <div className="font-medium text-white">{title}</div>
+            <div className="text-sm text-neutral-400">{artist}</div>
+          </div>
         </div>
 
         <div className="flex md:grid grid-cols-3 items-center gap-4">
@@ -149,7 +188,7 @@ const MusicPlayer = () => {
                 )}
               </button>
 
-              <button>
+              <button onClick={handleNextSong} >
                 <SkipForward className="h-5 w-5 text-neutral-400" />
               </button>
               <button>

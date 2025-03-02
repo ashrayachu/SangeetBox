@@ -1,15 +1,21 @@
 import React from 'react';
-import {Link} from 'react-router-dom';  
-import { useLocation } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from "react-redux";
+import { clearError } from "../redux/slices/playSong";
 
 const Error = () => {
-    const location = useLocation();
- 
-    const errorMessage = location.state?.message || "Something went wrong.";
-    const status = location.state?.status || "404";
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-    console.log("errorMessage", errorMessage)
-    console.log("status", status)
+
+
+  const handleReturn = () => {
+    dispatch(clearError());
+    navigate('/'); // Navigate back to the home page
+
+  }
+  const errorMessage = location.state?.message || "Something went wrong.";
+  const status = location.state?.status || "404";
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
       <h1 className="text-6xl font-bold text-gray-800 dark:text-gray-200 mb-4">{status}</h1>
@@ -18,7 +24,7 @@ const Error = () => {
         Oops! The page you're looking for doesn't exist. It might have been moved or deleted.
       </p>
       <button>
-        <Link className='text-white hover:text-blue-400' to='/'>Return to Home</Link>
+        <span className='text-white hover:text-blue-400' onClick={handleReturn}>Return to Home</span>
       </button>
     </div>
   )

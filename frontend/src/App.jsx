@@ -8,6 +8,7 @@ import MusicPlayer from "./components/MusicPlayer";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import Error from "./pages/Error";
+import Playlist from "./pages/Playlist";
 
 import Footer from "./components/Footer";
 import Test from "./components/Test";
@@ -16,7 +17,7 @@ import Test from "./components/Test";
 function App() {
   // const [maximize, setMaximize] = useState(false); // Moved state to App
   return (
-    <Router> 
+    <Router>
       <div className="h-screen flex flex-col ">
         <Navbar />
         <div className="flex flex-grow">
@@ -27,11 +28,15 @@ function App() {
               <Route path="/search/:query" element={<Search />} />
               <Route path="/karaoke/:songId" element={<Karaoke />} />
               <Route path="/error" element={<Error />} />
-
-            </Routes>    
-          </div>    
+              <Route path="/playlist/:playlistId" element={<Playlist />} />
+            </Routes>
+          </div>
         </div>
-        <MusicPlayer />
+        <Footer />
+        <div className="relative z-50">
+          <MusicPlayer />
+        </div>  
+
       </div>
     </Router>
     // <Router>
