@@ -14,11 +14,11 @@ const Home = () => {
         (state) => state.spotify
     );
 
-    // // 🎵 Fetch Songs & Playlists on Page Load
-    // useEffect(() => {
-    //     dispatch(fetchTrendingSongs());
-    //     dispatch(fetchTrendingPlaylists());
-    // }, [dispatch]);
+    // Fetch Songs & Playlists on Page Load
+    useEffect(() => {
+        dispatch(fetchTrendingSongs());
+        dispatch(fetchTrendingPlaylists());
+    }, [dispatch]);
 
     return (
         <div className="text-white bg-black p-1 md:p-10 min-h-screen">
