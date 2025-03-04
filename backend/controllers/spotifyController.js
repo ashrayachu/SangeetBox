@@ -29,14 +29,19 @@ getSpotifyToken();
 
 const searchTracks = async (req, res) => {
   const { query } = req.query;
+  console.log("query", query);
 
   if (!query) {
     return res.status(400).json({ error: "Query parameter is required" });
   }
+  if (!spotifyToken) {
+    console.error("Spotify token is missing, crashing app...");
+    process.exit(1); // Force a crash if no token is available
+  }
 
   try {
     const response = await axios.get(
-      `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track,playlist&limit=10`,
+      `https://api.spotify.com/v1/search?q=${query}&type=track,playlist&limit=10`,
       { headers: { Authorization: `Bearer ${spotifyToken}` } }
     );
 
@@ -44,6 +49,7 @@ const searchTracks = async (req, res) => {
   } catch (error) {
     console.error("Error searching tracks:", error.message);
     res.status(500).json({ error: "Failed to fetch songs from Spotify" });
+    process.exit(1)
   }
 };
 

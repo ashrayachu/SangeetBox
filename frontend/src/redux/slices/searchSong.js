@@ -14,6 +14,7 @@ export const searchSongs = createAsyncThunk("search/searchSongs", async (query, 
     const response = await axios.get(`${API_URL}/api/search`, {
       params: { query },
     });
+  
     return response.data;
   } catch (error) {
     toast.error("Error searching songs. Try again later.");
